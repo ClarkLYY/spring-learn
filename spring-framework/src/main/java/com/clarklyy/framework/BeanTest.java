@@ -8,7 +8,11 @@ import com.clarklyy.framework.aware.BeanAware;
 @Controller
 public class BeanTest implements BeanAware {
     @Autowire
-    TestIoc testIoc;
+    private TestIoc testIoc;
+
+    public TestIoc getTestIoc() {
+        return testIoc;
+    }
 
     public void setBeanAware() {
         System.out.println("构造BeanTest");

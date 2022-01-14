@@ -7,8 +7,10 @@ import springBeanTest.config.Appconfig;
 
 public class BeanLifeCycle {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws CloneNotSupportedException {
 
+        Person p = new Person();
+        Person p2 = (Person) p.clone();
         System.out.println("现在开始初始化容器");
 
         ApplicationContext factory = new AnnotationConfigApplicationContext(Appconfig.class);

@@ -10,8 +10,12 @@ public class Test {
         //获取容器
         Context context = new Context();
         BeanTest beanTest = (BeanTest) context.getBean("BeanTest");
-        if(beanTest.testIoc==null){
-            System.out.println(1);
+        TestIoc testIoc = (TestIoc) context.getBean("TestIoc");
+        if(beanTest.getTestIoc()!=null){
+            System.out.println("testIoc成功注入");
+        }
+        if(testIoc.getBeanTest()!=null){
+            System.out.println("BeanTest成功注入");
         }
     }
 
