@@ -10,10 +10,7 @@ import com.clarklyy.framework.annotation.Service;
 import com.clarklyy.framework.utils.ReflectionUtil;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Context {
     private Set<Class<?>> classSet = new HashSet<Class<?>>();
@@ -102,5 +99,13 @@ public class Context {
             e.printStackTrace();
         }
         return obj;
+    }
+
+    public static void main(String[] args) {
+        List<Integer> list = new ArrayList<Integer>();
+        list.add(null);
+        for(Integer i:list){
+            System.out.println(i.toString());
+        }
     }
 }
