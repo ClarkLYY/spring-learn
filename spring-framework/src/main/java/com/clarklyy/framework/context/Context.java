@@ -76,6 +76,7 @@ public class Context {
                         System.out.println("找不到:"+beanFieldClass.getSimpleName());
                     }
                     ReflectionUtil.setField(obj, field, fieldInstance);
+                    System.out.println("往"+cls.getSimpleName()+"里注入"+beanFieldClass.getSimpleName()+"成功");
                 }
             }
             singletonObjects.put(cls.getSimpleName(), obj);

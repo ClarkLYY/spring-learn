@@ -11,11 +11,8 @@ public class Test {
         Context context = new Context();
         BeanTest beanTest = (BeanTest) context.getBean("BeanTest");
         TestIoc testIoc = (TestIoc) context.getBean("TestIoc");
-        if(beanTest.getTestIoc()!=null){
-            System.out.println("testIoc成功注入");
-        }
-        if(testIoc.getBeanTest()!=null){
-            System.out.println("BeanTest成功注入");
+        if(beanTest.getTestIoc()!=null&&testIoc.getBeanTest()!=null){
+            System.out.println("属性注入成功");
         }
     }
 
