@@ -1,19 +1,19 @@
-package com.clarklyy.framework;
+package com.clarklyy.framework.test;
 
 import com.clarklyy.framework.annotation.Autowire;
 import com.clarklyy.framework.annotation.Bean;
 import com.clarklyy.framework.aware.BeanAware;
 
 @Bean
-public class TestIoc implements BeanAware {
+public class BeanB implements BeanAware {
     @Autowire
-    private BeanTest beanTest;
+    private BeanA beanA;
 
-    public BeanTest getBeanTest() {
-        return beanTest;
+    public BeanA getBeanA() {
+        return beanA;
     }
 
     public void setBeanAware() {
-        System.out.println("构造TestIoc");
+        System.out.println("构造BeanB");
     }
 }

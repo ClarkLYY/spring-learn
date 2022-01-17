@@ -1,6 +1,9 @@
 package com.clarklyy.framework.context;
 
 import com.clarklyy.framework.annotation.Autowire;
+import com.clarklyy.framework.annotation.aspect.Aspect;
+import com.clarklyy.framework.aop.aspect.ProxyChain;
+import com.clarklyy.framework.aop.aspect.ProxyFactory;
 import com.clarklyy.framework.aware.BeanAware;
 import com.clarklyy.framework.exception.BeanNotFoundException;
 import com.clarklyy.framework.utils.ClassScanUtil;
@@ -10,6 +13,7 @@ import com.clarklyy.framework.annotation.Service;
 import com.clarklyy.framework.utils.ReflectionUtil;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.*;
 
 public class Context {
@@ -22,6 +26,9 @@ public class Context {
     //生成实例的工厂set（3级缓存）
     private final Map<String, ObjectFactory> singletonFactories = new HashMap<String, ObjectFactory>();
 
+    //目标->切面类
+    private final Map<Class<?>, List<Class<?>>> targetMap = new HashMap<>();
+
     public Context(){
         this.refresh();
     }
@@ -30,9 +37,14 @@ public class Context {
      * 容器初始化方法
      */
     public void refresh(){
+        //扫描包名下的类，获取class
         this.classScan();
+        //bean实例化
         this.beanInit();
+        //bean属性注入
         this.populate();
+        //扫描代理，生成代理类
+        this.doProxy();
     }
 
     /**
@@ -77,6 +89,37 @@ public class Context {
                 }
             }
             singletonObjects.put(cls.getSimpleName(), obj);
+        }
+    }
+
+    private void doProxy(){
+        for(Class<?> cls:classSet){
+            if(cls.isAnnotationPresent(Aspect.class)){
+//                Aspect obj = (Aspect) ReflectionUtil.newInstance(cls);
+                Class<?> targetCls = ReflectionUtil.getClassForName("com.clarklyy.framework.test.BeanA");
+//                Method[] methods = targetCls.getMethods();
+//                List<String> targetMethods = Arrays.asList(obj.methods());
+//                List<Method> methodList = new ArrayList<>();
+//                for(Method method:methods){
+//                    if(targetMethods.contains(method.getName())){
+//                        methodList.add(method);
+//                    }
+//                }
+                if(targetMap.get(targetCls)!=null){
+                    List<Class<?>> list = targetMap.get(targetCls);
+                    list.add(cls);
+                }else{
+                    List<Class<?>> list = new ArrayList<>();
+                    list.add(cls);
+                    targetMap.put(targetCls,list);
+                }
+            }
+        }
+        for(Map.Entry<Class<?>, List<Class<?>>> entry:targetMap.entrySet()){
+            Class<?> targetCls = entry.getKey();
+            ProxyChain proxyChain = new ProxyChain(entry.getValue());
+            Object proxyBean = ProxyFactory.getProxy(targetCls, proxyChain);
+            singletonObjects.put(targetCls.getSimpleName(), proxyBean);
         }
     }
 

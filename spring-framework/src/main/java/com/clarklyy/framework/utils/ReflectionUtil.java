@@ -30,4 +30,17 @@ public class ReflectionUtil {
             e.printStackTrace();
         }
     }
+
+    /**
+     * 设置属性注入值
+     */
+    public static Class<?> getClassForName(String str){
+        Class<?> cls = null;
+        try {
+            cls = Class.forName(str);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return cls;
+    }
 }
