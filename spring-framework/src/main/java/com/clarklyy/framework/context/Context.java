@@ -27,7 +27,9 @@ public class Context {
     private final Map<String, ObjectFactory> singletonFactories = new HashMap<String, ObjectFactory>();
 
     //目标->切面类
-    private final Map<Class<?>, List<Class<?>>> targetMap = new HashMap<>();
+    private final Map<Class<?>, List<Class<?>>> targetAspectMap = new HashMap<>();
+
+    private final Map<Class<?>, List<Method>> targetMethodsMap = new HashMap<>();
 
     public Context(){
         this.refresh();
@@ -95,29 +97,37 @@ public class Context {
     private void doProxy(){
         for(Class<?> cls:classSet){
             if(cls.isAnnotationPresent(Aspect.class)){
-//                Aspect obj = (Aspect) ReflectionUtil.newInstance(cls);
-                Class<?> targetCls = ReflectionUtil.getClassForName("com.clarklyy.framework.test.BeanA");
-//                Method[] methods = targetCls.getMethods();
-//                List<String> targetMethods = Arrays.asList(obj.methods());
-//                List<Method> methodList = new ArrayList<>();
-//                for(Method method:methods){
-//                    if(targetMethods.contains(method.getName())){
-//                        methodList.add(method);
-//                    }
-//                }
-                if(targetMap.get(targetCls)!=null){
-                    List<Class<?>> list = targetMap.get(targetCls);
+                Aspect aspect = cls.getAnnotation(Aspect.class);
+                Class<?> targetCls = ReflectionUtil.getClassForName(aspect.cls());
+                Method[] methods = targetCls.getMethods();
+                List<String> targetMethodList = Arrays.asList(aspect.methods());
+                List<Method> methodList = new ArrayList<>();
+                for(Method method:methods){
+                    if(targetMethodList.contains(method.getName())){
+                        methodList.add(method);
+                    }
+                }
+                if(targetAspectMap.get(targetCls)!=null){
+                    List<Class<?>> list = targetAspectMap.get(targetCls);
                     list.add(cls);
                 }else{
                     List<Class<?>> list = new ArrayList<>();
                     list.add(cls);
-                    targetMap.put(targetCls,list);
+                    targetAspectMap.put(targetCls,list);
+                }
+
+                if(targetMethodsMap.get(targetCls)!=null){
+                    List<Method> list = targetMethodsMap.get(targetCls);
+                    list.addAll(methodList);
+                }else{
+                    targetMethodsMap.put(targetCls, methodList);
                 }
             }
         }
-        for(Map.Entry<Class<?>, List<Class<?>>> entry:targetMap.entrySet()){
+        for(Map.Entry<Class<?>, List<Class<?>>> entry:targetAspectMap.entrySet()){
             Class<?> targetCls = entry.getKey();
-            ProxyChain proxyChain = new ProxyChain(entry.getValue());
+            Method[] methods = targetMethodsMap.get(targetCls).toArray(new Method[0]);
+            ProxyChain proxyChain = new ProxyChain(entry.getValue(), methods);
             Object proxyBean = ProxyFactory.getProxy(targetCls, proxyChain);
             singletonObjects.put(targetCls.getSimpleName(), proxyBean);
         }

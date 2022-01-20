@@ -15,29 +15,25 @@ public class ProxyFactory {
         List<Class<?>> aspects = proxyChain.getAspects();
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(cls);
-        enhancer.setCallback(new MethodInterceptor() {
-            @Override
-            public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
-                for(Class<?> aspect:aspects){
-                    Method[] methods = aspect.getDeclaredMethods();
-                    for(Method aspectMethod : methods){
-                        if(aspectMethod.isAnnotationPresent(Before.class)){
-                            aspectMethod.invoke(aspect.newInstance());
-//                            System.out.println(1);
-                        }
+        enhancer.setCallback((MethodInterceptor) (o, method, objects, methodProxy) -> {
+            for(Class<?> aspect:aspects){
+                Method[] methods = aspect.getDeclaredMethods();
+                for(Method aspectMethod : methods){
+                    if(aspectMethod.isAnnotationPresent(Before.class)){
+                        aspectMethod.invoke(aspect.newInstance());
                     }
                 }
-                Object result = methodProxy.invokeSuper(o,objects);
-                for(Class<?> aspect:aspects){
-                    Method[] methods = aspect.getDeclaredMethods();
-                    for(Method aspectMethod : methods){
-                        if(aspectMethod.isAnnotationPresent(After.class)){
-                            aspectMethod.invoke(aspect.newInstance());
-                        }
-                    }
-                }
-                return result;
             }
+            Object result = methodProxy.invokeSuper(o,proxyChain.getTargetMethod());
+            for(Class<?> aspect:aspects){
+                Method[] methods = aspect.getDeclaredMethods();
+                for(Method aspectMethod : methods){
+                    if(aspectMethod.isAnnotationPresent(After.class)){
+                        aspectMethod.invoke(aspect.newInstance());
+                    }
+                }
+            }
+            return result;
         });
         return (T) enhancer.create();
     }

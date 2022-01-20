@@ -5,31 +5,23 @@ import java.util.List;
 
 public class ProxyChain {
     private  List<Class<?>> aspects;
-    private Object targetObject;
-    private Method targetMethod;
+    private Method[] targetMethod;
 
     public void setAspects(List<Class<?>> aspects) {
         this.aspects = aspects;
     }
 
-    public Object getTargetObject() {
-        return targetObject;
-    }
-
-    public void setTargetObject(Object targetObject) {
-        this.targetObject = targetObject;
-    }
-
-    public Method getTargetMethod() {
+    public Method[] getTargetMethod() {
         return targetMethod;
     }
 
-    public void setTargetMethod(Method targetMethod) {
+    public void setTargetMethod(Method[] targetMethod) {
         this.targetMethod = targetMethod;
     }
 
-    public ProxyChain(List<Class<?>> aspects){
+    public ProxyChain(List<Class<?>> aspects, Method[] targetMethod){
         this.aspects = aspects;
+        this.targetMethod = targetMethod;
     }
 
     public  List<Class<?>> getAspects() {
