@@ -32,7 +32,7 @@ public class ReflectionUtil {
     }
 
     /**
-     * 设置属性注入值
+     * 根据全限定类名创建实例
      */
     public static Class<?> getClassForName(String str){
         Class<?> cls = null;

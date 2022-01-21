@@ -67,15 +67,16 @@ public class Context extends BeanRegister{
                 beanNameClassMap.put(cls.getSimpleName(), cls);
                 //bean实例化
                 final Object obj = ReflectionUtil.newInstance(cls);
-                //bean放入三级缓存
-                String beanName = cls.getSimpleName();
-//                singletonFactories.put(beanName, new ObjectFactory() {
-//                    @Override
-//                    public Object getObject() {
-//                        return getEarlyBeanReference(obj, cls);
-//                    }
-//                });
-                earlySingletonObjects.put(cls.getSimpleName(), this.getEarlyBeanReference(obj, cls));
+                //Spring中进行aop代理时，需要对bean实例化对象进行早期扩展，这个扩展就在三级缓存中的ObjectFactory中进行
+                //然后将工厂生成的对象放到二级缓存中，避免每次都调用三级缓存进行扩展信息的扫描
+                //这里为了方便将这个过程一并放到beanInstance中了
+                singletonFactories.put(cls.getSimpleName(), new ObjectFactory() {
+                    @Override
+                    public Object getObject() {
+                        return getEarlyBeanReference(obj, cls);
+                    }
+                });
+                earlySingletonObjects.put(cls.getSimpleName(), singletonFactories.get(cls.getSimpleName()).getObject());
                 this.invokeAware(obj);
             }
         }
@@ -123,6 +124,9 @@ public class Context extends BeanRegister{
         }
     }
 
+    /**
+     * 扫描切面，并封装代理map
+     */
     private void scanProxy(){
         for(Class<?> cls:classSet){
             if(cls.isAnnotationPresent(Aspect.class)){
@@ -163,7 +167,7 @@ public class Context extends BeanRegister{
     }
 
     /**
-     * beanAware
+     * 实例化bean时，提供bean感知接口
      * @param bean
      */
     private void invokeAware(Object bean) {
