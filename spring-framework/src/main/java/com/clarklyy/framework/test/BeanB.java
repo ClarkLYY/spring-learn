@@ -13,6 +13,10 @@ public class BeanB implements BeanAware {
         return beanA;
     }
 
+    public void init(){
+        System.out.println("init beanB");
+    }
+
     public void setBeanAware() {
         System.out.println("构造BeanB");
     }

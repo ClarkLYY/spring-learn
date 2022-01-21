@@ -9,8 +9,12 @@ public class BeanA implements BeanAware {
     @Autowire
     private BeanB beanB;
 
-    public void init(){
+    public void init(int arg1){
         System.out.println("init beanA");
+    }
+
+    public void noProxy(int a, int b){
+        System.out.println("no Proxy method");
     }
 
     public BeanB getBeanB() {

@@ -9,10 +9,19 @@ public class MyAspect {
 
     @Before
     public void before(){
-        System.out.println("这是before");
+        System.out.println("这是AspectA的before");
     }
+//    @Before
+//    public void before2(){
+//        System.out.println("这是AspectA的before2");
+//    }
+
     @After
     public void after(){
-        System.out.println("这是after");
+        System.out.println("这是AspectA的after");
     }
+//    @After
+//    public void after2(){
+//        System.out.println("这是AspectA的after2");
+//    }
 }
